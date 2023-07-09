@@ -87,7 +87,7 @@ class Hashids implements HashidsInterface
      *
      * @return void
      */
-    public function __construct($salt = '', $minHashLength = 0, $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',$prefix = null)
+    public function __construct($salt = '', $minHashLength = 0, $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', $prefix = null)
     {
         $this->salt = $salt;
         $this->minHashLength = $minHashLength;
@@ -148,7 +148,7 @@ class Hashids implements HashidsInterface
 
         if (!$numbers) {
             if ($this->prefix !== null) {
-                return $this->prefix.$this->prefixSeparator.$ret;
+                return $this->prefix . $this->prefixSeparator . $ret;
             }
             return $ret;
         }
@@ -158,7 +158,7 @@ class Hashids implements HashidsInterface
 
             if (!$isNumber) {
                 if ($this->prefix !== null) {
-                    return $this->prefix.$this->prefixSeparator.$ret;
+                    return $this->prefix . $this->prefixSeparator . $ret;
                 }
                 return $ret;
             }
@@ -174,7 +174,7 @@ class Hashids implements HashidsInterface
 
         $lottery = $ret = $alphabet[$numbersHashInt % strlen($alphabet)];
         foreach ($numbers as $i => $number) {
-            $alphabet = $this->shuffle($alphabet, substr($lottery.$this->salt.$alphabet, 0, strlen($alphabet)));
+            $alphabet = $this->shuffle($alphabet, substr($lottery . $this->salt . $alphabet, 0, strlen($alphabet)));
             $ret .= $last = $this->hash($number, $alphabet);
 
             if ($i + 1 < $numbersSize) {
@@ -188,7 +188,7 @@ class Hashids implements HashidsInterface
             $guardIndex = ($numbersHashInt + ord($ret[0])) % strlen($this->guards);
 
             $guard = $this->guards[$guardIndex];
-            $ret = $guard.$ret;
+            $ret = $guard . $ret;
 
             if (strlen($ret) < $this->minHashLength) {
                 $guardIndex = ($numbersHashInt + ord($ret[2])) % strlen($this->guards);
@@ -201,7 +201,7 @@ class Hashids implements HashidsInterface
         $halfLength = (int) (strlen($alphabet) / 2);
         while (strlen($ret) < $this->minHashLength) {
             $alphabet = $this->shuffle($alphabet, $alphabet);
-            $ret = substr($alphabet, $halfLength).$ret.substr($alphabet, 0, $halfLength);
+            $ret = substr($alphabet, $halfLength) . $ret . substr($alphabet, 0, $halfLength);
 
             $excess = strlen($ret) - $this->minHashLength;
             if ($excess > 0) {
@@ -209,7 +209,7 @@ class Hashids implements HashidsInterface
             }
         }
         if ($this->prefix !== null) {
-            return $this->prefix.$this->prefixSeparator.$ret;
+            return $this->prefix . $this->prefixSeparator . $ret;
         }
         return $ret;
     }
@@ -223,8 +223,10 @@ class Hashids implements HashidsInterface
      */
     public function decode($hash)
     {
-        if ($this->prefix !== null) {
-            $hash = explode($this->prefix.$this->prefixSeparator, $hash)[1];
+        if ($this->prefix !== null && $this->prefixSeparator) {
+            $hash = explode($this->prefix . $this->prefixSeparator, $hash)[1];
+        } else if ($this->prefix !== null) {
+            $hash = substr($hash, strlen($this->prefix), strlen($hash));
         }
         $ret = [];
 
@@ -251,7 +253,7 @@ class Hashids implements HashidsInterface
             $hashArray = explode(' ', $hashBreakdown);
 
             foreach ($hashArray as $subHash) {
-                $alphabet = $this->shuffle($alphabet, substr($lottery.$this->salt.$alphabet, 0, strlen($alphabet)));
+                $alphabet = $this->shuffle($alphabet, substr($lottery . $this->salt . $alphabet, 0, strlen($alphabet)));
                 $result = $this->unhash($subHash, $alphabet);
                 if (Math::comp($result, PHP_INT_MAX) <= 0) {
                     $ret[] = Math::intval($result);
@@ -261,7 +263,7 @@ class Hashids implements HashidsInterface
             }
 
             if ($this->prefix !== null) {
-                if ($this->encode($ret) != $this->prefix.$this->prefixSeparator.$hash) {
+                if ($this->encode($ret) != $this->prefix . $this->prefixSeparator . $hash) {
                     $ret = [];
                 }
             } else {
@@ -291,7 +293,7 @@ class Hashids implements HashidsInterface
         $numbers = explode(' ', $numbers);
 
         foreach ($numbers as $i => $number) {
-            $numbers[$i] = hexdec('1'.$number);
+            $numbers[$i] = hexdec('1' . $number);
         }
 
         return call_user_func_array([$this, 'encode'], $numbers);
@@ -359,7 +361,7 @@ class Hashids implements HashidsInterface
         $alphabetLength = strlen($alphabet);
 
         do {
-            $hash = $alphabet[Math::intval(Math::mod($input, $alphabetLength))].$hash;
+            $hash = $alphabet[Math::intval(Math::mod($input, $alphabetLength))] . $hash;
 
             $input = Math::divide($input, $alphabetLength);
         } while (Math::comp(0, $input) != 0);
