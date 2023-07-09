@@ -12,6 +12,7 @@
 
 namespace Amamarul\Hashids\Support;
 
+use Illuminate\Support\Arr;
 use Amamarul\Hashids\Support\Hashids\Hashids;
 
 /**
@@ -47,10 +48,10 @@ class HashidsFactory
     protected function getConfig(array $config)
     {
         return [
-            'salt' => array_get($config, 'salt', ''),
-            'length' => array_get($config, 'length', 0),
-            'alphabet' => array_get($config, 'alphabet', ''),
-            'prefix' => array_get($config, 'prefix', null),
+            'salt' => Arr::get($config, 'salt', ''),
+            'length' => Arr::get($config, 'length', 0),
+            'alphabet' => Arr::get($config, 'alphabet', ''),
+            'prefix' => Arr::get($config, 'prefix', null),
         ];
     }
 
